@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonitorPro - Tableau de Bord</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background-color: #1a202c;
+        }
+        .sidebar .nav-link {
+            color: #a0aec0;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover {
+            background-color: #2d3748;
+            color: #fff;
+        }
+        .sidebar .nav-link.active {
+            background-color: #3182ce;
+            color: #fff;
+        }
+        .main-content {
+            margin-left: 16.66667%; /* Équivalent à col-md-2 */
+            padding: 20px;
+        }
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .search-bar {
+            max-width: 400px;
+            width: 100%;
+        }
+        .server-card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+        }
+        .server-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .server-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-good { background-color: #48bb78; }
+        .status-warning { background-color: #ecc94b; }
+        .status-critical {
+            background-color: #f56565;
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(245, 101, 101, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(245, 101, 101, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(245, 101, 101, 0);
+            }
+        }
+        .chart-container {
+            height: 200px;
+        }
+        .btn-toggle-charts {
+            transition: all 0.3s ease;
+        }
+        .btn-toggle-charts:hover {
+            transform: translateY(-2px);
+        }
+        .blink {
+            animation: blink-animation 1s steps(5, start) infinite;
+        }
+        @keyframes blink-animation {
+            to {
+                visibility: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block sidebar">
+            <div class="position-sticky">
+                <div class="text-center mb-4">
+                    <img src="https://via.placeholder.com/150x50?text=MonitorPro" alt="MonitorPro Logo" class="img-fluid">
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-server me-2"></i>
+                            Serveurs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-users me-2"></i>
+                            Utilisateurs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-cog me-2"></i>
+                            Configuration
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Rapports
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="col-md-10 ms-sm-auto px-md-4 main-content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 mb-4">
+                <div class="container-fluid">
+                    <form class="search-bar me-3">
+                        <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                            <input type="text" class="form-control border-0 bg-light" placeholder="Rechercher...">
+                        </div>
+                    </form>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i class="fas fa-bell"></i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i class="fas fa-user-circle"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <h1 class="h2 mb-4">Tableau de Bord des Serveurs</h1>
+
+            <div class="row" id="serverContainer">
+                <!-- Les cartes de serveur seront générées ici dynamiquement -->
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const serverData = [
+        { name: "Serveur 1", cpu: 65, memory: 80, storage: 45, network: [20, 35, 60, 80, 45], status: "good" },
+        { name: "Serveur 2", cpu: 95, memory: 90, storage: 85, network: [30, 45, 70, 60, 55], status: "critical" },
+        { name: "Serveur 3", cpu: 75, memory: 60, storage: 50, network: [40, 55, 65, 70, 50], status: "warning" },
+    ];
+
+    function createServerCard(server) {
+        const statusClass = `status-${server.status}`;
+        const isCritical = server.status === 'critical';
+        const cardHtml = `
+                <div class="col-md-4 mb-4">
+                    <div class="card server-card">
+                        <div class="card-body">
+                            <h5 class="card-title d-flex justify-content-between align-items-center mb-3">
+                                ${server.name}
+                                <span class="server-status ${statusClass}"></span>
+                            </h5>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>CPU</span>
+                                    <span>${server.cpu}%</span>
+                                </div>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar" role="progressbar" style="width: ${server.cpu}%;" aria-valuenow="${server.cpu}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Mémoire</span>
+                                    <span>${server.memory}%</span>
+                                </div>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: ${server.memory}%;" aria-valuenow="${server.memory}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Stockage</span>
+                                    <span>${server.storage}%</span>
+                                </div>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: ${server.storage}%;" aria-valuenow="${server.storage}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary w-100 btn-toggle-charts ${isCritical ? 'btn-danger blink' : ''}" data-server="${server.name}">
+                                ${isCritical ? '<i class="fas fa-exclamation-triangle me-2"></i>' : ''}
+                                Afficher les détails
+                            </button>
+                        </div>
+                        <div class="card-footer bg-transparent" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="chart-container">
+                                        <canvas class="cpu-chart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="chart-container">
+                                        <canvas class="memory-chart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="chart-container">
+                                        <canvas class="storage-chart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="chart-container">
+                                        <canvas class="network-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        $('#serverContainer').append(cardHtml);
+    }
+
+    function createGaugeChart(ctx, value, label, color) {
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [value, 100 - value],
+                    backgroundColor: [color, '#e9ecef']
+                }]
+            },
+            options: {
+                circumference: 180,
+                rotation: -90,
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                },
+                animation: { animateRotate: false, animateScale: true }
+            }
+        });
+    }
+
+    function createLineChart(ctx, data) {
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['1min', '2min', '3min', '4min', '5min'],
+                datasets: [{
+                    label: 'Réseau',
+                    data: data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 100 }
+                }
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        serverData.forEach(createServerCard);
+
+        $('.btn-toggle-charts').on('click', function() {
+            const serverName = $(this).data('server');
+            const footer = $(this).closest('.card-body').siblings('.card-footer');
+            const isHidden = footer.is(':hidden');
+
+            footer.slideToggle(300);
+            $(this).text(isHidden ? 'Masquer les détails' : 'Afficher les détails');
+
+            if (isHidden) {
+                const server = serverData.find(s => s.name === serverName);
+                const cpuChart = createGaugeChart(footer.find('.cpu-chart')[0], server.cpu, 'CPU', '#007bff');
+                const memoryChart = createGaugeChart(footer.find('.memory-chart')[0], server.memory, 'Mémoire', '#28a745');
+                const storageChart = createGaugeChart(footer.find('.storage-chart')[0], server.storage, 'Stockage', '#ffc107');
+                const networkChart = createLineChart(footer.find('.network-chart')[0], server.network);
+            }
+        });
+    });
+</script>
+</body>
+</html>
+
